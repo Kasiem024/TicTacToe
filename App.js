@@ -1,7 +1,14 @@
 'use strict';
 
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
+import React, {
+  useState
+} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable
+} from 'react-native';
 
 export default function App() {
 
@@ -15,11 +22,6 @@ export default function App() {
 
   const [player, setPlayer] = useState('x'); // Creating the player variable to store the current player
 
-  // Function to announce the winner
-  const announceWinner = (winner) => {
-    alert(`Player ${winner.toUpperCase()} is the winner!`);
-  }
-
   const cellPressHandler = (rowIndex, cellIndex) => {
     if (gameMap[rowIndex][cellIndex] !== null) {
       // If the cell is already filled, do nothing
@@ -31,6 +33,12 @@ export default function App() {
     newGameMap[rowIndex][cellIndex] = player; // Update the value of the cell
     setGameMap(newGameMap); // Update the state
 
+    checkGameOver(rowIndex, cellIndex); // Check if the game is over
+
+    setPlayer(player === 'x' ? 'o' : 'x'); // Switch the player
+  }
+
+  const checkGameOver = (rowIndex, cellIndex) => {
     const winState = (cell) => cell === player;
 
     if (gameMap[rowIndex].every(winState)) {
@@ -39,10 +47,10 @@ export default function App() {
       return;
     }
 
-    let verticalWinArr = [];
-    let tieCheckArr = [];
+    let verticalWinArr = [],
+      tieCheckArr = [];
 
-    gameMap.forEach((row, index) => {
+    gameMap.forEach(row => {
       verticalWinArr.push(row[cellIndex]);
       // Push the value of all the cells in the same column as the pressed cell
 
@@ -75,8 +83,11 @@ export default function App() {
       setTimeout(() => alert('Tie!'), 200);
       return;
     }
+  }
 
-    setPlayer(player === 'x' ? 'o' : 'x'); // switch the player
+  // Function to announce the winner
+  const announceWinner = async (winner) => {
+    alert(`Player ${winner.toUpperCase()} is the winner!`);
   }
 
   return (
@@ -172,10 +183,14 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: 'white',
     borderRadius: 5,
-    transform: [{ rotate: '45deg' }],
+    transform: [{
+      rotate: '45deg'
+    }],
   },
   crossLineReversed: {
-    transform: [{ rotate: '-45deg' }],
+    transform: [{
+      rotate: '-45deg'
+    }],
   },
   btn: {
     backgroundColor: 'rgb(13,60,150)',
