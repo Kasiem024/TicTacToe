@@ -1,4 +1,5 @@
-import { StatusBar } from 'expo-status-bar';
+'use strict';
+
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 
@@ -14,6 +15,11 @@ export default function App() {
 
   const [player, setPlayer] = useState('x'); // Creating the player variable to store the current player
 
+  const announceWinner = (winner) => {
+    // Function to announce the winner
+    alert(`Player ${winner.toUpperCase()} is the winner!`);
+  }
+
   const cellPressHandler = (rowIndex, cellIndex) => {
     if (gameMap[rowIndex][cellIndex] !== null) { // If the cell is already filled, do nothing
       alert('Cell already occupied');
@@ -23,6 +29,35 @@ export default function App() {
     const newGameMap = [...gameMap]; // copy the array
     newGameMap[rowIndex][cellIndex] = player; // update the value of the cell
     setGameMap(newGameMap); // update the state
+
+    const winState = (cell) => cell === player; // (true) if the cell is equal to the player
+
+    if (gameMap[rowIndex].every(winState)) {
+      // If all the cells in the row are equal to the player (horizontal win)
+      setTimeout(announceWinner, 200, player);
+    }
+
+    let verticalWinArr = [];
+
+    gameMap.forEach(row => {
+      verticalWinArr.push(row[cellIndex]);
+      // Push the value of all the cells in the same column to the temp array
+    });
+
+    if (verticalWinArr.every(winState)) {
+      // If all the cells in the column are equal to the player (vertical win)
+      setTimeout(announceWinner, 200, player);
+    }
+
+    if (gameMap[0][0] === player && gameMap[1][1] === player && gameMap[2][2] === player) {
+      // If the top left to bottom right diagonal is equal to the player (diagonal win)
+      setTimeout(announceWinner, 200, player);
+    }
+
+    if (gameMap[0][2] === player && gameMap[1][1] === player && gameMap[2][0] === player) {
+      // If the top right to bottom left diagonal is equal to the player (diagonal win)
+      setTimeout(announceWinner, 200, player);
+    }
 
     setPlayer(player === 'x' ? 'o' : 'x'); // switch the player
   }
@@ -43,16 +78,15 @@ export default function App() {
             {row.map((cell, cellIndex) => // For each cell (value inside row)
               <Pressable onPress={() => cellPressHandler(rowIndex, cellIndex)} style={[styles.cell, styles.center]}>
 
-                {cell === 'o' && ( // If cell is 'o'
-                  <View style={[styles.circle, styles.center]} /> // Display a circle
+                {cell === 'o' && (
+                  <View style={[styles.circle, styles.center]} />
                 )}
 
-                {cell === 'x' && ( // If cell is 'x'
+                {cell === 'x' && (
                   <View style={[styles.cross]}>
-                    <View style={styles.crossLine} /> {/* Top line */}
-                    <View style={[styles.crossLine, styles.crossLineReversed]} /> {/* Bottom line */}
+                    <View style={styles.crossLine} />
+                    <View style={[styles.crossLine, styles.crossLineReversed]} />
                   </View>
-
                 )}
               </Pressable>
             )}
@@ -60,11 +94,13 @@ export default function App() {
         ))}
       </View>
 
-      <Pressable style={[styles.center]} onPress={() => setGameMap([
-        [null, null, null],
-        [null, null, null],
-        [null, null, null],
-      ])}>
+      {/* Resets the gameboard */}
+      <Pressable style={[styles.center]}
+        onPress={() => setGameMap([
+          [null, null, null],
+          [null, null, null],
+          [null, null, null],
+        ])}>
         <Text style={[styles.btn, styles.center]}>Reset</Text>
       </Pressable>
     </View>
