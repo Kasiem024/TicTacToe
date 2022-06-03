@@ -1,7 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ImageBackground } from 'react-native';
-import bgImage from './assets/bg.jpeg'; // Importing the background image
+import { StyleSheet, Text, View, Pressable } from 'react-native';
 
 export default function App() {
 
@@ -13,32 +12,61 @@ export default function App() {
     [null, null, null],
   ]);
 
+  const [player, setPlayer] = useState('x'); // Creating the player variable to store the current player
+
+  const cellPressHandler = (rowIndex, cellIndex) => {
+    if (gameMap[rowIndex][cellIndex] !== null) { // If the cell is already filled, do nothing
+      alert('Cell already occupied');
+      return;
+    }
+
+    const newGameMap = [...gameMap]; // copy the array
+    newGameMap[rowIndex][cellIndex] = player; // update the value of the cell
+    setGameMap(newGameMap); // update the state
+
+    setPlayer(player === 'x' ? 'o' : 'x'); // switch the player
+  }
+
   return (
     <View style={[styles.container, styles.center]}>
 
-      <ImageBackground source={bgImage} style={[styles.backgroundImage, styles.center]}>
-        <View style={styles.map}>
+      <Text style={styles.title}>
+        Tic Tac Toe {'\n'} Player {player.toUpperCase()}'s turn
+      </Text>
 
-          {gameMap.map((row, rowIndex) => (
-            <View style={styles.row}>
-              {row.map(cell =>
-                <View style={[styles.cell, styles.center]}>
-                  <View style={[styles.circle, styles.center]} />
+      <View style={styles.map}>
 
-                  {/* <View style={[styles.cross]}>
-                    <View style={styles.crossLine} />
-                    <View style={[styles.crossLine, styles.crossLineReversed]} />
-                  </View> */}
-                </View>
-              )}
-            </View>
-          ))}
+        {/* Loop through the game board and display the values */}
 
-        </View>
+        {gameMap.map((row, rowIndex) => ( // For each row (array inside gameMap)
+          <View style={styles.row}>
+            {row.map((cell, cellIndex) => // For each cell (value inside row)
+              <Pressable onPress={() => cellPressHandler(rowIndex, cellIndex)} style={[styles.cell, styles.center]}>
 
-      </ImageBackground>
+                {cell === 'o' && ( // If cell is 'o'
+                  <View style={[styles.circle, styles.center]} /> // Display a circle
+                )}
 
-      <StatusBar style="auto" />
+                {cell === 'x' && ( // If cell is 'x'
+                  <View style={[styles.cross]}>
+                    <View style={styles.crossLine} /> {/* Top line */}
+                    <View style={[styles.crossLine, styles.crossLineReversed]} /> {/* Bottom line */}
+                  </View>
+
+                )}
+              </Pressable>
+            )}
+          </View>
+        ))}
+      </View>
+
+      <Pressable style={[styles.center]} onPress={() => setGameMap([
+        [null, null, null],
+        [null, null, null],
+        [null, null, null],
+      ])}>
+        <Text style={[styles.btn, styles.center]}>Reset</Text>
+      </Pressable>
     </View>
   );
 }
@@ -50,18 +78,21 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#242D34', // The same color as the background image
+    backgroundColor: '#242D34',
+    padding: 20,
   },
-  backgroundImage: {
-    width: '100%',
-    height: '100%',
+  title: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   map: {
-    width: '78%',
-    height: 1000,
-    left: 5,
-    top: '5%',
+    width: '100%',
     aspectRatio: 1,
+    borderColor: 'white',
+    borderWidth: 5,
   },
   row: {
     flex: 1,
@@ -70,29 +101,33 @@ const styles = StyleSheet.create({
   cell: {
     flex: 1,
     borderColor: 'white',
-    borderWidth: 1,
+    borderWidth: 2,
   },
   circle: {
-    width: 225,
-    height: 225,
+    width: '85%',
+    height: '85%',
     borderRadius: '100%',
     borderColor: 'white',
-    borderWidth: 7,
+    borderWidth: 10,
   },
   cross: {
-    width: 225,
-    height: 225,
+    flex: 1,
   },
   crossLine: {
     position: 'absolute',
     width: 10,
-    height: 275,
-    left: 100,
+    height: '100%',
     backgroundColor: 'white',
     borderRadius: 5,
     transform: [{ rotate: '45deg' }],
   },
   crossLineReversed: {
     transform: [{ rotate: '-45deg' }],
+  },
+  btn: {
+    backgroundColor: 'rgb(13,60,150)',
+    fontSize: 25,
+    marginTop: 20,
+    padding: 10,
   },
 });
